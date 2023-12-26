@@ -1,0 +1,7 @@
+1. cut the length when it crosses the len the list and minus it and then re iterrate until it is not len the of flames list
+2. starting index always should be the next of the removed letter
+3. 
+
+5sec youtubr video link
+https://www.youtube.com/watch?v=GHOZ6HggUvA
+

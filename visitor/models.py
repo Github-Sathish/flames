@@ -9,4 +9,4 @@ class Input(models.Model):
     result = models.CharField(max_length=210 , blank = True,null = True)
     
     def __str__(self) -> str:
-        return f'-----{self.your_name}'
+        return f'---{self.your_name}-----{self.partner_name}---{self.result}----'

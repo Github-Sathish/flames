@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLAMES Game</title>
+    <link rel="stylesheet" href="{% static 'visitor/styles.css' %}">
+</head>
+<body>
+    <h1>FLAMES Game</h1>
+    
+    <form id="flamesForm">
+        {% csrf_token %}
+        <!-- Include CSRF token in the form -->
+        
+        <label for="yourName">Your Name:</label>
+        <input type="text" id="yourName" required>
+
+        <label for="partnerName">Partner's Name:</label>
+        <input type="text" id="partnerName" required>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <div id="result"></div>
+    <!-- New div for the joke -->
+    <div id="youtubeForm">
+        <form id="videoForm" onsubmit="submitVideoForm(event)">
+            <label for="videoUrl">YouTube Video URL:</label>
+            <input type="text" id="videoUrl" required>
+            <button type="submit">Download Video</button>
+        </form>
+    </div>
+    <div id="joke">
+        <p style='color:brown'>{{ joke }}</p>
+    </div>
+
+    <script>
+      function submitVideoForm(event) {
+        event.preventDefault();  // Prevent the default form submission behavior
+
+        var videoUrl = document.getElementById('videoUrl').value;
+        
+        // Get CSRF token from cookies
+        var csrftoken = getCookie('csrftoken');
+
+        fetch('/visitor/downloadVideo/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                video_url: videoUrl,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response as needed (e.g., display a message to the user)
+            console.log('Download response:', data);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+        // ... (Your JavaScript code remains unchanged)
+        function submitForm() {
+            var yourName = document.getElementById('yourName').value;
+            var partnerName = document.getElementById('partnerName').value;
+            
+            // Get CSRF token from cookies
+            var csrftoken = getCookie('csrftoken');
+    
+            fetch('/visitor/getResult/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({
+                    your_name: yourName,
+                    partner_name: partnerName,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display the result
+                document.getElementById('result').innerHTML = 'Relationship Status: ' + data.message;
+                // Move PyJoke display to the bottom
+                document.getElementById('joke').innerHTML = '<p>' + data.joke + '</p>';
+                console.log("joke---->",data)
+
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+
+    </body>
+</html>
